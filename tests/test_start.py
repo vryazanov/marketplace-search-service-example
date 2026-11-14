@@ -30,3 +30,20 @@ def test_explicit_configuration_wins(monkeypatch):
 
     assert os.environ["DATABASE_URL"] == "postgresql+asyncpg://explicit/db"
     assert os.environ["KAFKA_BOOTSTRAP_SERVERS"] == "explicit:9092"
+
+
+def test_search_url_and_topic_mapping(monkeypatch):
+    import os
+
+    monkeypatch.delenv("AD_SERVICE_URL", raising=False)
+    monkeypatch.delenv("KAFKA_TOPIC_ADS", raising=False)
+    monkeypatch.setenv("KAFKA_TOPIC_MARKETPLACE_ADS", "student_alice-marketplace.ads")
+    monkeypatch.setenv(
+        "POSTGRES_DATABASE_NAME", "student_alice-marketplace-search-service-postgres"
+    )
+    configure_environment()
+    assert os.environ["KAFKA_TOPIC_ADS"] == "student_alice-marketplace.ads"
+    assert os.environ["AD_SERVICE_URL"] == (
+        "http://student-alice-marketplace-ad-service-web."
+        "student-alice-marketplace-ad-service.svc:8000"
+    )

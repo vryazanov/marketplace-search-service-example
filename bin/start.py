@@ -17,12 +17,23 @@ def configure_environment() -> None:
         os.environ["DATABASE_URL"] = connection
     if "KAFKA_BROKERS" in os.environ:
         os.environ.setdefault("KAFKA_BOOTSTRAP_SERVERS", os.environ["KAFKA_BROKERS"])
+    if "KAFKA_TOPIC_MARKETPLACE_ADS" in os.environ:
+        os.environ.setdefault(
+            "KAFKA_TOPIC_ADS", os.environ["KAFKA_TOPIC_MARKETPLACE_ADS"]
+        )
     database = os.environ.get("POSTGRES_DATABASE_NAME", "")
     if database.endswith("-ad-service-postgres"):
         namespace = database.removesuffix("-ad-service-postgres")
         namespace = namespace.replace("_", "-") + "-auth-service"
         os.environ.setdefault(
             "AUTH_SERVICE_URL", f"http://{namespace}-web.{namespace}.svc:8000"
+        )
+
+    if database.endswith("-search-service-postgres"):
+        namespace = database.removesuffix("-search-service-postgres")
+        namespace = namespace.replace("_", "-") + "-ad-service"
+        os.environ.setdefault(
+            "AD_SERVICE_URL", f"http://{namespace}-web.{namespace}.svc:8000"
         )
 
 
